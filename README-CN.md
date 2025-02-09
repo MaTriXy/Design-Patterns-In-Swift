@@ -9,6 +9,11 @@
 
 🇨🇳 中文版由 [@binglogo](https://twitter.com/binglogo) 整理翻译。
 
+🚀 如何由源代码，并生成 README 与 Playground 产物，请查看：
+- [CONTRIBUTING.md](https://github.com/ochococo/Design-Patterns-In-Swift/blob/master/CONTRIBUTING.md)
+- [CONTRIBUTING-CN.md](https://github.com/ochococo/Design-Patterns-In-Swift/blob/master/CONTRIBUTING-CN.md)
+
+
 
 ```swift
 print("您好！")
@@ -22,14 +27,14 @@ print("您好！")
 | [🐝 责任链 Chain Of Responsibility](#-责任链chain-of-responsibility) | [🌰 抽象工厂 Abstract Factory](#-抽象工厂abstract-factory) | [🔌 适配器 Adapter](#-适配器adapter)                          |
 | [👫 命令 Command](#-命令command)                              | [👷 生成器 Builder](#-生成器builder)                       | [🌉 桥接 Bridge](#-桥接bridge)                                |
 | [🎶 解释器 Interpreter](#-解释器interpreter)                  | [🏭 工厂方法 Factory Method](#-工厂方法factory-method)     | [🌿 组合 Composite](#-组合composite)                          |
-| [🍫 迭代器 Iterator](#-迭代器iterator)                        | [🃏 原型 Prototype](#-原型prototype)                       | [🍧 修饰 Decorator](#-修饰decorator)                          |
-| [💐 中介者 Mediator](#-中介者mediator)                        | [💍 单例 Singleton](#-单例singleton)                       | [🎁 外观 Façade](#-外观facade)                                |
-| [💾 备忘录 Memento](#-备忘录memento)                          |                                                           | [🍃 享元 Flyweight](#-享元flyweight)                          |
+| [🍫 迭代器 Iterator](#-迭代器iterator)                        | [🔂 单态 Monostate](#-单态monostate)                       | [🍧 修饰 Decorator](#-修饰decorator)                          |
+| [💐 中介者 Mediator](#-中介者mediator)                        | [🃏 原型 Prototype](#-原型prototype)                       | [🎁 外观 Façade](#-外观facade)                                |
+| [💾 备忘录 Memento](#-备忘录memento)                          | [💍 单例 Singleton](#-单例singleton)                       | [🍃 享元 Flyweight](#-享元flyweight)                          |
 | [👓 观察者 Observer](#-观察者observer)                        |                                                           | [☔ 保护代理 Protection Proxy](#-保护代理模式protection-proxy) |
 | [🐉 状态 State](#-状态state)                                  |                                                           | [🍬 虚拟代理 Virtual Proxy](#-虚拟代理virtual-proxy)          |
 | [💡 策略 Strategy](#-策略strategy)                            |                                                           |                                                              |
+| [📝 模板方法 Templdate Method](#-template-method)             |                                                           |                                                              |
 | [🏃 访问者 Visitor](#-访问者visitor)                          |                                                           |                                                              |
-
 
  行为型模式
  ========
@@ -90,7 +95,7 @@ final class MoneyPile: Withdrawing {
             return true
         }
 
-        if let next = self.next {
+        if let next {
             return next.withdraw(amount: amount)
         }
 
@@ -687,6 +692,59 @@ let gaff = BladeRunner(test: GeneticTest())
 let isDeckardAndroid = gaff.testIfAndroid(rachel)
 ```
 
+📝 模板方法模式
+-----------
+
+ 模板方法模式是一种行为设计模式， 它通过父类/协议中定义了一个算法的框架， 允许子类/具体实现对象在不修改结构的情况下重写算法的特定步骤。
+
+### 示例：
+
+```swift
+protocol Garden {
+    func prepareSoil()
+    func plantSeeds()
+    func waterPlants()
+    func prepareGarden()
+}
+
+extension Garden {
+
+    func prepareGarden() {
+        prepareSoil()
+        plantSeeds()
+        waterPlants()
+    }
+}
+
+final class RoseGarden: Garden {
+
+    func prepare() {
+        prepareGarden()
+    }
+
+    func prepareSoil() {
+        print ("prepare soil for rose garden")
+    }
+
+    func plantSeeds() {
+        print ("plant seeds for rose garden")
+    }
+
+    func waterPlants() {
+       print ("water the rose garden")
+    }
+}
+
+```
+
+### 用法
+
+```swift
+
+let roseGarden = RoseGarden()
+roseGarden.prepare()
+```
+
 🏃 访问者（Visitor）
 --------------
 
@@ -949,6 +1007,49 @@ CurrencyFactory.currency(for: .unitedStates)?.code ?? noCurrencyCode
 CurrencyFactory.currency(for: .uk)?.code ?? noCurrencyCode
 ```
 
+ 🔂 单态（Monostate）
+ ------------
+
+  单态模式是实现单一共享的另一种方法。不同于单例模式，它通过完全不同的机制，在不限制构造方法的情况下实现单一共享特性。
+  因此，在这种情况下，单态会将状态保存为静态，而不是将整个实例保存为单例。
+ [单例和单态 - Robert C. Martin](http://staff.cs.utu.fi/~jounsmed/doos_06/material/SingletonAndMonostate.pdf)
+
+### 示例:
+
+```swift
+class Settings {
+
+    enum Theme {
+        case `default`
+        case old
+        case new
+    }
+
+    private static var theme: Theme?
+
+    var currentTheme: Theme {
+        get { Settings.theme ?? .default }
+        set(newTheme) { Settings.theme = newTheme }
+    }
+}
+```
+
+### 用法:
+
+```swift
+import SwiftUI
+
+// 改变主题
+let settings = Settings() // 开始使用主题 .old
+settings.currentTheme = .new // 改变主题为 .new
+
+// 界面一
+let screenColor: Color = Settings().currentTheme == .old ? .gray : .white
+
+// 界面二
+let screenTitle: String = Settings().currentTheme == .old ? "Itunes Connect" : "App Store Connect"
+```
+
 🃏 原型（Prototype）
 --------------
 
@@ -957,7 +1058,7 @@ CurrencyFactory.currency(for: .uk)?.code ?? noCurrencyCode
 ### 示例：
 
 ```swift
-struct MoonWorker {
+class MoonWorker {
 
     let name: String
     var health: Int = 100
